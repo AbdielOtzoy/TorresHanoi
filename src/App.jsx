@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Tower from "./Tower";
 
 function App() {
@@ -34,6 +34,7 @@ function App() {
 
   const handleResolveHanoi = async (n, torre1, torre3, torre2) => {
     setIsSolving(true); // Set isSolving to true when the game starts solving
+    console.log(isSolving);
     if (n === 1) {
       await sleep(delay); // Wait for 1 second
       moveDisk(torre1, torre3, n);
@@ -43,7 +44,6 @@ function App() {
       moveDisk(torre1, torre3, n);
       await handleResolveHanoi(n - 1, torre2, torre3, torre1);
     }
-    setIsSolving(false); // Set isSolving to false when the game finishes solving
   };
 
   const sleep = (ms) => {
@@ -70,6 +70,14 @@ function App() {
     }
   };
 
+  // comprobar que los discos de la torre 3 esten completos, entonces mostrar mensaje de felicitaciones
+  useEffect(() => {
+    if (discos3.length === parseInt(numeroDiscos)) {
+      alert("¡Felicidades, has ganado!");
+      setIsSolving(false); // Set isSolving to false when the game is won
+    }
+  }, [discos3, numeroDiscos]);
+
   return (
     <main className="flex flex-col justify-center h-screen w-full p-8 gap-24">
       <div className="w-full flex justify-center items-center flex-col gap-5 max-md:mb-40">
@@ -91,7 +99,14 @@ function App() {
           <div className="flex justify-center">
             <button
               className="button w-full"
-              onClick={() => handleResolveHanoi(numeroDiscos, 1, 3, 2)}
+              onClick={() => {
+                // los discos tienen que estar en la torre 1
+                if (discos1.length === parseInt(numeroDiscos)) {
+                  handleResolveHanoi(numeroDiscos, 1, 3, 2);
+                } else {
+                  alert("Por favor, mueva todos los discos a la torre 1");
+                }
+              }}
               disabled={isSolving} // Disable the button while the game is being solved
             >
               Resolver
